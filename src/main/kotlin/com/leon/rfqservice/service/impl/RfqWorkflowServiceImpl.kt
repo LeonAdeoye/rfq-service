@@ -7,7 +7,6 @@ import com.leon.rfqservice.model.enums.WorkflowAction
 import com.leon.rfqservice.repository.RfqWorkflowEventRepository
 import com.leon.rfqservice.repository.RfqCommentRepository
 import com.leon.rfqservice.service.RfqWorkflowService
-import com.leon.rfqservice.service.TraderInfo
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -21,35 +20,26 @@ class RfqWorkflowServiceImpl @Autowired constructor(private val workflowEventRep
 
     override fun addWorkflowEvent(event: RfqWorkflowEvent): RfqWorkflowEvent 
     {
-        // TODO: Implement add workflow event logic
-        logger.info("Adding workflow event for RFQ: ${event.rfqId}")
         return workflowEventRepository.save(event)
     }
 
     override fun getWorkflowEvents(rfqId: String): List<RfqWorkflowEvent> 
     {
-        // TODO: Implement get workflow events logic
-        logger.info("Getting workflow events for RFQ: $rfqId")
         return workflowEventRepository.findByRfqIdOrderByTimestampDesc(rfqId)
     }
 
     override fun addComment(comment: RfqComment): RfqComment 
     {
-        // TODO: Implement add comment logic
-        logger.info("Adding comment for RFQ: ${comment.rfqId}")
         return commentRepository.save(comment)
     }
 
     override fun getComments(rfqId: String): List<RfqComment> 
     {
-        // TODO: Implement get comments logic
-        logger.info("Getting comments for RFQ: $rfqId")
         return commentRepository.findByRfqIdOrderByTimestampDesc(rfqId)
     }
 
     override fun processWorkflowAction(rfqId: String, action: WorkflowAction, userId: String, comment: String?, fieldChanges: Map<String, Any>): RfqWorkflowEvent 
     {
-        // TODO: Implement process workflow action logic
         logger.info("Processing workflow action: $action for RFQ: $rfqId")
         
         val event = RfqWorkflowEvent(
@@ -76,7 +66,6 @@ class RfqWorkflowServiceImpl @Autowired constructor(private val workflowEventRep
 
     override fun getValidStatusTransitions(currentStatus: RfqStatus, userRole: String): List<RfqStatus> 
     {
-        // TODO: Implement get valid status transitions logic
         logger.info("Getting valid status transitions for status: $currentStatus, role: $userRole")
         
         return when (currentStatus) 
@@ -111,19 +100,5 @@ class RfqWorkflowServiceImpl @Autowired constructor(private val workflowEventRep
             }
             else -> emptyList()
         }
-    }
-
-    override fun getAvailableTraders(): List<TraderInfo> 
-    {
-        // TODO: Implement get available traders logic
-        logger.info("Getting available traders")
-        
-        return listOf(
-            TraderInfo("john-smith", "John Smith (RT)", "RT"),
-            TraderInfo("jane-doe", "Jane Doe (RT)", "RT"),
-            TraderInfo("mike-wilson", "Mike Wilson (RT)", "RT"),
-            TraderInfo("sarah-johnson", "Sarah Johnson (ST)", "ST"),
-            TraderInfo("alex-brown", "Alex Brown (ST)", "ST")
-        )
     }
 }

@@ -38,16 +38,3 @@ data class RfqWorkflowEvent(
     val fieldChanges: Map<String, FieldChange> = emptyMap()
 )
 
-data class FieldChange(
-    @field:JsonProperty("fieldName")
-    val fieldName: String,
-    
-    @field:JsonProperty("oldValue")
-    val oldValue: Any?,
-    
-    @field:JsonProperty("newValue")
-    val newValue: Any?,
-    
-    @field:JsonProperty("changeType")
-    val changeType: String
-)

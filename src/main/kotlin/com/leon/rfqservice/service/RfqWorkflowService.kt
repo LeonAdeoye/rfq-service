@@ -18,12 +18,5 @@ interface RfqWorkflowService
     fun processWorkflowAction(rfqId: String, action: WorkflowAction, userId: String, comment: String? = null, fieldChanges: Map<String, Any> = emptyMap()): RfqWorkflowEvent
     
     fun getValidStatusTransitions(currentStatus: RfqStatus, userRole: String): List<RfqStatus>
-    
-    fun getAvailableTraders(): List<TraderInfo>
 }
 
-data class TraderInfo(
-    val id: String,
-    val name: String,
-    val role: String
-)

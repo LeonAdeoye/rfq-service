@@ -43,16 +43,3 @@ data class ClientStats(
     val successRate: Double
 )
 
-data class DailyStats(
-    @field:JsonProperty("date")
-    val date: String,
-    
-    @field:JsonProperty("totalRfqs")
-    val totalRfqs: Long,
-    
-    @field:JsonProperty("tradedAwayCount")
-    val tradedAwayCount: Long,
-    
-    @field:JsonProperty("tradeCompletedCount")
-    val tradeCompletedCount: Long
-)

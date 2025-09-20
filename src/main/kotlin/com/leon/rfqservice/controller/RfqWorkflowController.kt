@@ -7,14 +7,14 @@ import com.leon.rfqservice.model.enums.RfqStatus
 import com.leon.rfqservice.model.enums.WorkflowAction
 import com.leon.rfqservice.service.RfqWorkflowService
 import com.leon.rfqservice.service.RfqService
-import com.leon.rfqservice.service.TraderInfo
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
+@CrossOrigin
 @RestController
-@RequestMapping("/api/rfq/workflow")
+@RequestMapping("/rfq/workflow")
 class RfqWorkflowController @Autowired constructor(
     private val workflowService: RfqWorkflowService,
     private val rfqService: RfqService
@@ -25,7 +25,6 @@ class RfqWorkflowController @Autowired constructor(
     @PostMapping("/event")
     fun addWorkflowEvent(@RequestBody event: RfqWorkflowEvent): ResponseEntity<RfqWorkflowEvent> 
     {
-        // TODO: Implement add workflow event endpoint
         logger.info("Adding workflow event for RFQ: ${event.rfqId}")
         return try 
         {
@@ -42,7 +41,6 @@ class RfqWorkflowController @Autowired constructor(
     @GetMapping("/events/{rfqId}")
     fun getWorkflowEvents(@PathVariable rfqId: String): ResponseEntity<List<RfqWorkflowEvent>> 
     {
-        // TODO: Implement get workflow events endpoint
         logger.info("Getting workflow events for RFQ: $rfqId")
         return try 
         {
@@ -59,7 +57,6 @@ class RfqWorkflowController @Autowired constructor(
     @PostMapping("/comment")
     fun addComment(@RequestBody comment: RfqComment): ResponseEntity<RfqComment> 
     {
-        // TODO: Implement add comment endpoint
         logger.info("Adding comment for RFQ: ${comment.rfqId}")
         return try 
         {
@@ -76,7 +73,6 @@ class RfqWorkflowController @Autowired constructor(
     @GetMapping("/comments/{rfqId}")
     fun getComments(@PathVariable rfqId: String): ResponseEntity<List<RfqComment>> 
     {
-        // TODO: Implement get comments endpoint
         logger.info("Getting comments for RFQ: $rfqId")
         return try 
         {
@@ -91,26 +87,13 @@ class RfqWorkflowController @Autowired constructor(
     }
 
     @PostMapping("/action/{rfqId}")
-    fun processWorkflowAction(
-        @PathVariable rfqId: String,
-        @RequestParam action: String,
-        @RequestParam userId: String,
-        @RequestParam(required = false) comment: String?,
-        @RequestBody(required = false) fieldChanges: Map<String, Any>?
-    ): ResponseEntity<RfqWorkflowEvent> 
+    fun processWorkflowAction( @PathVariable rfqId: String, @RequestParam action: String, @RequestParam userId: String, @RequestParam(required = false) comment: String?, @RequestBody(required = false) fieldChanges: Map<String, Any>?): ResponseEntity<RfqWorkflowEvent>
     {
-        // TODO: Implement process workflow action endpoint
         logger.info("Processing workflow action: $action for RFQ: $rfqId")
         return try 
         {
             val actionEnum = WorkflowAction.valueOf(action.uppercase())
-            val event = workflowService.processWorkflowAction(
-                rfqId, 
-                actionEnum, 
-                userId, 
-                comment, 
-                fieldChanges ?: emptyMap()
-            )
+            val event = workflowService.processWorkflowAction(rfqId, actionEnum, userId, comment,fieldChanges ?: emptyMap())
             ResponseEntity.ok(event)
         } 
         catch (e: Exception) 
@@ -121,12 +104,8 @@ class RfqWorkflowController @Autowired constructor(
     }
 
     @GetMapping("/transitions/{status}/{userRole}")
-    fun getValidStatusTransitions(
-        @PathVariable status: String,
-        @PathVariable userRole: String
-    ): ResponseEntity<List<RfqStatus>> 
+    fun getValidStatusTransitions(@PathVariable status: String, @PathVariable userRole: String): ResponseEntity<List<RfqStatus>>
     {
-        // TODO: Implement get valid status transitions endpoint
         logger.info("Getting valid status transitions for status: $status, role: $userRole")
         return try 
         {
@@ -141,32 +120,9 @@ class RfqWorkflowController @Autowired constructor(
         }
     }
 
-    @GetMapping("/traders")
-    fun getAvailableTraders(): ResponseEntity<List<TraderInfo>> 
-    {
-        // TODO: Implement get available traders endpoint
-        logger.info("Getting available traders")
-        return try 
-        {
-            val traders = workflowService.getAvailableTraders()
-            ResponseEntity.ok(traders)
-        } 
-        catch (e: Exception) 
-        {
-            logger.error("Failed to get available traders", e)
-            ResponseEntity.badRequest().build()
-        }
-    }
-
     @PutMapping("/status/{rfqId}")
-    fun updateRfqStatus(
-        @PathVariable rfqId: String,
-        @RequestParam status: String,
-        @RequestParam userId: String,
-        @RequestParam(required = false) comment: String?
-    ): ResponseEntity<Rfq> 
+    fun updateRfqStatus(@PathVariable rfqId: String, @RequestParam status: String, @RequestParam userId: String, @RequestParam(required = false) comment: String?): ResponseEntity<Rfq>
     {
-        // TODO: Implement update RFQ status endpoint
         logger.info("Updating RFQ status: $rfqId to $status")
         return try 
         {
@@ -182,13 +138,8 @@ class RfqWorkflowController @Autowired constructor(
     }
 
     @PutMapping("/assign/{rfqId}")
-    fun assignRfq(
-        @PathVariable rfqId: String,
-        @RequestParam assignedTo: String,
-        @RequestParam userId: String
-    ): ResponseEntity<Rfq>
+    fun assignRfq(@PathVariable rfqId: String, @RequestParam assignedTo: String, @RequestParam userId: String): ResponseEntity<Rfq>
     {
-        // TODO: Implement assign RFQ endpoint
         logger.info("Assigning RFQ: $rfqId to $assignedTo")
         return try 
         {

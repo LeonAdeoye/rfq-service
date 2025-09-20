@@ -1,14 +1,11 @@
 package com.leon.rfqservice.service
 
 import com.leon.rfqservice.model.RfqStats
-import java.time.LocalDateTime
+import com.leon.rfqservice.model.DailyStats
+import com.leon.rfqservice.model.ClientSuccessRate
 
-interface RfqStatsService 
+interface RfqStatsService
 {
-    fun getRfqStats(): RfqStats
-    
-    fun getRfqStatsByDateRange(startDate: LocalDateTime, endDate: LocalDateTime): RfqStats
-    
     fun getRfqStatsByClient(client: String): RfqStats
     
     fun getRfqStatsByStatus(status: String): RfqStats
@@ -18,15 +15,3 @@ interface RfqStatsService
     fun getClientSuccessRates(): List<ClientSuccessRate>
 }
 
-data class DailyStats(
-    val date: String,
-    val totalRfqs: Long,
-    val tradedAwayCount: Long,
-    val tradeCompletedCount: Long
-)
-
-data class ClientSuccessRate(
-    val clientName: String,
-    val successRate: Double,
-    val totalRfqs: Long
-)

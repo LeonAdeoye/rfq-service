@@ -11,7 +11,7 @@ interface RfqService
     
     fun getRfqById(rfqId: String): Rfq?
     
-    fun getAllRfqs(): List<Rfq>
+    fun getAllRfqs(fromDaysAgo: Int): List<Rfq>
     
     fun getRfqsByStatus(status: RfqStatus): List<Rfq>
     
