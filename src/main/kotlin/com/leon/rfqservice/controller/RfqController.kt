@@ -21,6 +21,7 @@ class RfqController @Autowired constructor(private val rfqService: RfqService)
         return try 
         {
             val createdRfq = rfqService.createRfq(rfq)
+            logger.info("Successfully created RFQ: $createdRfq")
             ResponseEntity.ok(createdRfq)
         } 
         catch (e: Exception) 
