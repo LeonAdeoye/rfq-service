@@ -5,13 +5,18 @@ import com.leon.rfqservice.model.enums.RfqStatus
 import com.leon.rfqservice.repository.RfqRepository
 import com.leon.rfqservice.service.RfqService
 import com.leon.rfqservice.service.RfqWorkflowService
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
 @Service
-class RfqServiceImpl @Autowired constructor(private val rfqRepository: RfqRepository, private val workflowService: RfqWorkflowService) : RfqService
+class RfqServiceImpl @Autowired constructor(
+    private val rfqRepository: RfqRepository, 
+    private val workflowService: RfqWorkflowService,
+    private val objectMapper: ObjectMapper
+) : RfqService
 {
     private val logger = LoggerFactory.getLogger(RfqServiceImpl::class.java)
 
@@ -26,7 +31,12 @@ class RfqServiceImpl @Autowired constructor(private val rfqRepository: RfqReposi
             RuntimeException("RFQ not found: $rfqId") 
         }
 
-        val updatedRfq = existingRfq.copy(updatedAt = LocalDateTime.now())
+        @Suppress("UNCHECKED_CAST")
+        val rfqMap = objectMapper.convertValue(existingRfq, Map::class.java) as MutableMap<String, Any>
+        rfqMap.putAll(updates)
+        rfqMap["lastActivity"] = LocalDateTime.now().toString()
+        rfqMap["updatedAt"] = LocalDateTime.now()
+        val updatedRfq = objectMapper.convertValue(rfqMap, Rfq::class.java)
         return rfqRepository.save(updatedRfq)
     }
 
@@ -89,7 +99,7 @@ class RfqServiceImpl @Autowired constructor(private val rfqRepository: RfqReposi
         
         val updatedRfq = existingRfq.copy(assignedTo = assignedTo, lastActivity = LocalDateTime.now().toString(), updatedAt = LocalDateTime.now())
         val savedRfq = rfqRepository.save(updatedRfq)
-        workflowService.processWorkflowAction(rfqId, com.leon.rfqservice.model.enums.WorkflowAction.ASSIGN, userId,            "Assigned to $assignedTo")
+        workflowService.processWorkflowAction(rfqId, com.leon.rfqservice.model.enums.WorkflowAction.ASSIGNMENT, userId,            "Assigned to $assignedTo")
         return savedRfq
     }
 }
