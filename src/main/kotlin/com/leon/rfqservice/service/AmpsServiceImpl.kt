@@ -1,8 +1,7 @@
-package com.leon.rfqservice.service.impl
+package com.leon.rfqservice.service
 
 import com.leon.rfqservice.model.Rfq
 import com.leon.rfqservice.model.RfqWorkflowEvent
-import com.leon.rfqservice.service.AmpsService
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.crankuptheamps.client.Client
 import jakarta.annotation.PreDestroy

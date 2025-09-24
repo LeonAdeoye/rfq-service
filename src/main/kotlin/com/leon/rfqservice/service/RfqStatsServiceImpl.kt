@@ -1,11 +1,10 @@
-package com.leon.rfqservice.service.impl
+package com.leon.rfqservice.service
 
 import com.leon.rfqservice.model.RfqStats
 import com.leon.rfqservice.model.DailyStats
 import com.leon.rfqservice.model.ClientSuccessRate
 import com.leon.rfqservice.model.enums.RfqStatus
 import com.leon.rfqservice.repository.RfqRepository
-import com.leon.rfqservice.service.RfqStatsService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service

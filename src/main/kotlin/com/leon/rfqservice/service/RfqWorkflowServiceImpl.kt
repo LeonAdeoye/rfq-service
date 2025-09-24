@@ -1,4 +1,4 @@
-package com.leon.rfqservice.service.impl
+package com.leon.rfqservice.service
 
 import com.leon.rfqservice.model.RfqWorkflowEvent
 import com.leon.rfqservice.model.RfqComment
@@ -6,7 +6,6 @@ import com.leon.rfqservice.model.enums.RfqStatus
 import com.leon.rfqservice.model.enums.WorkflowAction
 import com.leon.rfqservice.repository.RfqWorkflowEventRepository
 import com.leon.rfqservice.repository.RfqCommentRepository
-import com.leon.rfqservice.service.RfqWorkflowService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
