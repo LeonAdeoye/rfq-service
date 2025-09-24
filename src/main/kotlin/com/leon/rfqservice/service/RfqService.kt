@@ -13,15 +13,5 @@ interface RfqService
     
     fun getAllRfqs(fromDaysAgo: Int): List<Rfq>
     
-    fun getRfqsByStatus(status: RfqStatus): List<Rfq>
-    
-    fun getRfqsByClient(client: String): List<Rfq>
-    
-    fun getRfqsByAssignedTo(assignedTo: String): List<Rfq>
-    
     fun deleteRfq(rfqId: String): Boolean
-    
-    fun updateRfqStatus(rfqId: String, status: RfqStatus, userId: String, comment: String? = null): Rfq
-    
-    fun assignRfq(rfqId: String, assignedTo: String, userId: String): Rfq
 }
