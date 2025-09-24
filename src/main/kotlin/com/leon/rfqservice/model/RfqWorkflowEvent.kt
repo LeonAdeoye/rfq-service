@@ -7,7 +7,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
 
-@Document(collection = "rfq_workflow_events")
+@Document(collection = "RfqWorkflowEvents")
 data class RfqWorkflowEvent(
     @Id
     @field:JsonProperty("id")
