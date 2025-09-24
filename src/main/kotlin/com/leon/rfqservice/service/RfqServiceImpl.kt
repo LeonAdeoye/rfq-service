@@ -1,7 +1,6 @@
 package com.leon.rfqservice.service
 
 import com.leon.rfqservice.model.Rfq
-import com.leon.rfqservice.model.enums.RfqStatus
 import com.leon.rfqservice.repository.RfqRepository
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory

@@ -1,7 +1,6 @@
 package com.leon.rfqservice.service
 
 import com.leon.rfqservice.model.Rfq
-import com.leon.rfqservice.model.enums.RfqStatus
 
 interface RfqService 
 {

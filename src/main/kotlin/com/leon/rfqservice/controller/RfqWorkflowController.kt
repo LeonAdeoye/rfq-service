@@ -1,8 +1,6 @@
 package com.leon.rfqservice.controller
 
 import com.leon.rfqservice.model.RfqWorkflowEvent
-import com.leon.rfqservice.model.enums.RfqStatus
-import com.leon.rfqservice.model.enums.WorkflowAction
 import com.leon.rfqservice.service.RfqWorkflowService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
