@@ -9,15 +9,14 @@ import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
 @Service
-class RfqServiceImpl @Autowired constructor(private val rfqRepository: RfqRepository, private val workflowService: RfqWorkflowService,
-    private val objectMapper: ObjectMapper, private val ampsService: AmpsService) : RfqService
+class RfqServiceImpl @Autowired constructor(private val rfqRepository: RfqRepository, private val objectMapper: ObjectMapper, private val ampsService: AmpsService) : RfqService
 {
     private val logger = LoggerFactory.getLogger(RfqServiceImpl::class.java)
 
     override fun createRfq(rfq: Rfq): Rfq 
     {
-        return rfqRepository.save(rfq)
         ampsService.publishRfqUpdate(rfq)
+        return rfqRepository.save(rfq)
     }
 
     override fun updateRfq(rfqId: String, updates: Map<String, Any>): Rfq 
@@ -38,15 +37,8 @@ class RfqServiceImpl @Autowired constructor(private val rfqRepository: RfqReposi
         return savedRfq;
     }
 
-    override fun getRfqById(rfqId: String): Rfq? 
-    {
-        return rfqRepository.findById(rfqId).orElse(null)
-    }
-
-    override fun getAllRfqs(fromDaysAgo: Int): List<Rfq>
-    {
-        return rfqRepository.findAll()
-    }
+    override fun getRfqById(rfqId: String): Rfq? = rfqRepository.findById(rfqId).orElse(null)
+    override fun getAllRfqs(fromDaysAgo: Int): List<Rfq> = rfqRepository.findAll()
 
     override fun deleteRfq(rfqId: String): Boolean
     {
