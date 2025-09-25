@@ -31,9 +31,8 @@ class RfqServiceImpl @Autowired constructor(private val rfqRepository: RfqReposi
         rfqMap["lastActivity"] = LocalDateTime.now().toString()
         rfqMap["updatedAt"] = LocalDateTime.now()
         val updatedRfq = objectMapper.convertValue(rfqMap, Rfq::class.java)
-        ampsService.publishRfqUpdate(updatedRfq)
         val savedRfq = rfqRepository.save(updatedRfq)
-        ampsService.publishRfqUpdate(updatedRfq)
+        ampsService.publishRfqUpdate(savedRfq)
         return savedRfq;
     }
 
