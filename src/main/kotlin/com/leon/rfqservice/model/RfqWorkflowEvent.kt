@@ -35,6 +35,6 @@ data class RfqWorkflowEvent(
     val comment: String?,
     
     @field:JsonProperty("fieldChanges")
-    val fieldChanges: Map<String, FieldChange> = emptyMap()
+    val fieldChanges: List<FieldChange> = emptyList()
 )
 

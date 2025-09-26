@@ -37,17 +37,31 @@ class RfqServiceImpl @Autowired constructor(private val rfqRepository: RfqReposi
     }
 
     override fun getRfqById(rfqId: String): Rfq? = rfqRepository.findById(rfqId).orElse(null)
-    override fun getAllRfqs(fromDaysAgo: Int): List<Rfq> = rfqRepository.findAll()
+    override fun getAllRfqs(fromDaysAgo: Int): List<Rfq> = rfqRepository.findAll().filter {
+        it.active
+    }
 
     override fun deleteRfq(rfqId: String): Boolean
     {
-        logger.info("Deleting RFQ: $rfqId")
-        return try 
+        return try
         {
-            rfqRepository.deleteById(rfqId)
-            true
-        } 
-        catch (e: Exception) 
+
+            logger.info("Deleting RFQ: $rfqId")
+            val rfq = rfqRepository.findById(rfqId).orElse(null)
+            if (rfq != null)
+            {
+                val deletedRfq = rfq.copy(active = false, updatedAt = LocalDateTime.now())
+                rfqRepository.save(deletedRfq)
+                ampsService.publishRfqUpdate(deletedRfq)
+                true
+            }
+            else
+            {
+                logger.warn("RFQ not found: $rfqId")
+                false
+            }
+        }
+        catch (e: Exception)
         {
             logger.error("Failed to delete RFQ: $rfqId", e)
             false

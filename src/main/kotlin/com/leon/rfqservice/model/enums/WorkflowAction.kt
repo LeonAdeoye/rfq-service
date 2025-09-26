@@ -6,4 +6,5 @@ enum class WorkflowAction
     ASSIGNMENT,
     COMMENT,
     STATUS_CHANGE,
+    FIELD_CHANGE
 }

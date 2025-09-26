@@ -205,5 +205,8 @@ data class Rfq(
     val createdAt: LocalDateTime = LocalDateTime.now(),
     
     @field:JsonProperty("updatedAt")
-    val updatedAt: LocalDateTime = LocalDateTime.now()
+    val updatedAt: LocalDateTime = LocalDateTime.now(),
+
+    @field:JsonProperty("active")
+    val active: Boolean = true
 )
