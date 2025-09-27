@@ -8,7 +8,11 @@ import org.springframework.stereotype.Repository
 @Repository
 interface RfqRepository : MongoRepository<Rfq, String> 
 {
-    fun findByStatus(status: RfqStatus): List<Rfq>
+    fun findByActiveTrue(): List<Rfq>
     
-    fun findByClient(client: String): List<Rfq>
+    fun findByActiveTrueAndTradeDate(tradeDate: String): List<Rfq>
+    
+    fun findByActiveTrueAndClientAndTradeDate(client: String, tradeDate: String): List<Rfq>
+    
+    fun findByActiveTrueAndStatusAndTradeDate(status: RfqStatus, tradeDate: String): List<Rfq>
 }

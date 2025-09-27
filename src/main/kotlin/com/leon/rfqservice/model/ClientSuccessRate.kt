@@ -8,6 +8,9 @@ data class ClientSuccessRate(
     
     @field:JsonProperty("successRate")
     val successRate: Double,
+
+    @field:JsonProperty("failureRate")
+    val failureRate: Double,
     
     @field:JsonProperty("totalRfqs")
     val totalRfqs: Long
