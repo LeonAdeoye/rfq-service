@@ -37,7 +37,7 @@ class RfqStatsController @Autowired constructor(private val statsService: RfqSta
     @GetMapping("/clients/{status}")
     fun getClientStatsByStatus(@PathVariable status: String): ResponseEntity<List<ClientStats>> 
     {
-        logger.info("Received request to get client stats by status: $status")
+        logger.info("Received request to get client stats with status: $status")
         return try 
         {
             val stats = statsService.getClientStatsByStatus(status)
@@ -45,7 +45,7 @@ class RfqStatsController @Autowired constructor(private val statsService: RfqSta
         } 
         catch (e: Exception) 
         {
-            logger.error("Failed to get client stats by status: $status", e)
+            logger.error("Failed to get client stats with status: $status", e)
             ResponseEntity.badRequest().build()
         }
     }
@@ -53,7 +53,7 @@ class RfqStatsController @Autowired constructor(private val statsService: RfqSta
     @GetMapping("/instruments/{status}")
     fun getInstrumentStatsByStatus(@PathVariable status: String): ResponseEntity<List<InstrumentStats>> 
     {
-        logger.info("Received request to get instrument stats by status: $status")
+        logger.info("Received request to get instrument stats with status: $status")
         return try 
         {
             val stats = statsService.getInstrumentStatsByStatus(status)
@@ -61,7 +61,7 @@ class RfqStatsController @Autowired constructor(private val statsService: RfqSta
         } 
         catch (e: Exception) 
         {
-            logger.error("Failed to get instrument stats by status: $status", e)
+            logger.error("Failed to get instrument stats with status: $status", e)
             ResponseEntity.badRequest().build()
         }
     }
