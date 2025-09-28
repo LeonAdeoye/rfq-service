@@ -2,7 +2,7 @@ package com.leon.rfqservice.controller
 
 import com.leon.rfqservice.model.RfqStats
 import com.leon.rfqservice.model.DailyStats
-import com.leon.rfqservice.model.ClientSuccessRate
+import com.leon.rfqservice.model.ClientPercentages
 import com.leon.rfqservice.model.ClientStats
 import com.leon.rfqservice.model.InstrumentStats
 import com.leon.rfqservice.service.RfqStatsService
@@ -82,18 +82,18 @@ class RfqStatsController @Autowired constructor(private val statsService: RfqSta
         }
     }
 
-    @GetMapping("/client-percentage-rates/{fromTradeDate}") // mm-dd-yyyy
-    fun getClientPercentageRates(@PathVariable fromTradeDate: String): ResponseEntity<List<ClientSuccessRate>>
+    @GetMapping("/client-percentages/{fromTradeDate}") // mm-dd-yyyy
+    fun getClientPercentages(@PathVariable fromTradeDate: String): ResponseEntity<List<ClientPercentages>>
     {
-        logger.info("Received request to get client percentage rates from trade date $fromTradeDate")
+        logger.info("Received request to get client percentages from trade date $fromTradeDate")
         return try 
         {
-            val successRates = statsService.getClientPercentageRates(fromTradeDate)
+            val successRates = statsService.getClientPercentages(fromTradeDate)
             ResponseEntity.ok(successRates)
         } 
         catch (e: Exception) 
         {
-            logger.error("Failed to get client percentage rates", e)
+            logger.error("Failed to get client percentages", e)
             ResponseEntity.badRequest().build()
         }
     }

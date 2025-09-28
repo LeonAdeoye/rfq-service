@@ -3,7 +3,7 @@ package com.leon.rfqservice.service
 import com.leon.rfqservice.model.ClientStats
 import com.leon.rfqservice.model.RfqStats
 import com.leon.rfqservice.model.DailyStats
-import com.leon.rfqservice.model.ClientSuccessRate
+import com.leon.rfqservice.model.ClientPercentages
 import com.leon.rfqservice.model.InstrumentStats
 import com.leon.rfqservice.model.enums.RfqStatus
 import com.leon.rfqservice.repository.RfqRepository
@@ -94,7 +94,7 @@ class RfqStatsServiceImpl @Autowired constructor(private val rfqRepository: RfqR
         return dailyStats.sortedBy { it.date }
     }
 
-    override fun getClientPercentageRates(tradeDate: String): List<ClientSuccessRate>
+    override fun getClientPercentages(tradeDate: String): List<ClientPercentages>
     {
         val inputDate = try
         {
@@ -123,15 +123,15 @@ class RfqStatsServiceImpl @Autowired constructor(private val rfqRepository: RfqR
                 val tradedAwayRate = if (totalRfqs > 0) (tradedAwayCount.toDouble() / totalRfqs.toDouble()) * 100.0 else 0.0
                 val othersRate = 100.0 - tradeCompletedRate - tradedAwayRate;
                 
-                ClientSuccessRate(
+                ClientPercentages(
                     clientName = clientName,
-                    tradeCompletedRate = tradeCompletedRate,
-                    tradedAwayRate = tradedAwayRate,
-                    othersRate = othersRate,
+                    tradeCompletedPercent = tradeCompletedRate,
+                    tradedAwayPrecent = tradedAwayRate,
+                    othersPercent = othersRate,
                     totalRfqs = totalRfqs
                 )
             }
-            .sortedByDescending { it.tradeCompletedRate }
+            .sortedByDescending { it.tradeCompletedPercent }
         
         return clientStats
     }
