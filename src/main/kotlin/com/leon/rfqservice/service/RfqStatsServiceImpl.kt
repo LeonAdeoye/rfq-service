@@ -2,6 +2,7 @@ package com.leon.rfqservice.service
 
 import com.leon.rfqservice.model.ClientStats
 import com.leon.rfqservice.model.RfqStats
+import com.leon.rfqservice.model.StatusAggregates
 import com.leon.rfqservice.model.DailyStats
 import com.leon.rfqservice.model.ClientPercentages
 import com.leon.rfqservice.model.InstrumentStats
@@ -20,10 +21,29 @@ class RfqStatsServiceImpl @Autowired constructor(private val rfqRepository: RfqR
         val today = LocalDate.now().format(DateTimeFormatter.ofPattern("M/d/yyyy"))
         val clientRfqs = rfqRepository.findByActiveTrueAndClientAndTradeDate(client, today)
         val totalRfqs = clientRfqs.size.toLong()
-        val statusCounts = RfqStatus.values().associateWith { status ->
-            clientRfqs.count { it.status == status }.toLong()
+        
+        // Calculate status-specific aggregates for this client
+        val statusAggregates = RfqStatus.values().associateWith { status ->
+            val rfqsForStatus = clientRfqs.filter { it.status == status }
+            val count = rfqsForStatus.size.toLong()
+            val totalNotionalInUSD = rfqsForStatus.sumOf { it.notionalInUSD.toDoubleOrNull() ?: 0.0 }
+            val totalSalesCreditAmount = rfqsForStatus.sumOf { it.salesCreditAmount.toDoubleOrNull() ?: 0.0 }
+            val averageNotionalInUSD = if (count > 0) totalNotionalInUSD / count else 0.0
+            val averageSalesCreditAmount = if (count > 0) totalSalesCreditAmount / count else 0.0
+            
+            StatusAggregates(
+                count = count,
+                totalNotionalInUSD = totalNotionalInUSD,
+                totalSalesCreditAmount = totalSalesCreditAmount,
+                averageNotionalInUSD = averageNotionalInUSD,
+                averageSalesCreditAmount = averageSalesCreditAmount
+            )
         }
-        return RfqStats(totalRfqs = totalRfqs, statusCounts = statusCounts)
+        
+        return RfqStats(
+            totalRfqs = totalRfqs,
+            statusAggregates = statusAggregates
+        )
     }
 
     override fun getClientStatsByStatus(status: String): List<ClientStats>
@@ -36,11 +56,15 @@ class RfqStatsServiceImpl @Autowired constructor(private val rfqRepository: RfqR
             .map { (clientName, rfqs) ->
                 val statusCount = rfqs.size.toLong()
                 val totalNotional = rfqs.sumOf { it.notionalInLocal }
+                val totalSalesCreditAmount = rfqs.sumOf { it.salesCreditAmount.toDoubleOrNull() ?: 0.0 }
                 ClientStats(
                     clientName = if(clientName == "Select Client") "Unknown" else clientName,
                     statusCount = statusCount,
                     totalNotional = totalNotional,
-                    averageNotional = if (statusCount > 0) totalNotional / statusCount else 0.0
+                    averageNotional = if (statusCount > 0) totalNotional / statusCount else 0.0,
+                    totalSalesCreditAmount = totalSalesCreditAmount,
+                    averageSalesCreditAmount = if (statusCount > 0) totalSalesCreditAmount / statusCount else 0.0,
+                    status = statusEnum
                 )
             }
             .sortedByDescending { it.statusCount }
@@ -56,8 +80,18 @@ class RfqStatsServiceImpl @Autowired constructor(private val rfqRepository: RfqR
             .map { (instrument, rfqs) ->
                 val statusCount = rfqs.size.toLong()
                 val totalNotional = rfqs.sumOf { it.notionalInLocal }
+                val totalSalesCreditAmount = rfqs.sumOf { it.salesCreditAmount.toDoubleOrNull() ?: 0.0 }
                 val averageNotional = if (statusCount > 0) totalNotional / statusCount else 0.0
-                InstrumentStats(instrument = instrument, statusCount = statusCount, totalNotional = totalNotional, averageNotional = averageNotional)
+                val averageSalesCreditAmount = if (statusCount > 0) totalSalesCreditAmount / statusCount else 0.0
+                InstrumentStats(
+                    instrument = instrument, 
+                    statusCount = statusCount, 
+                    totalNotional = totalNotional, 
+                    averageNotional = averageNotional,
+                    totalSalesCreditAmount = totalSalesCreditAmount,
+                    averageSalesCreditAmount = averageSalesCreditAmount,
+                    status = statusEnum
+                )
             }
             .sortedByDescending { it.statusCount }
     }
@@ -113,7 +147,7 @@ class RfqStatsServiceImpl @Autowired constructor(private val rfqRepository: RfqR
                 val tradeCompletedRate = if (totalRfqs > 0) (tradeCompletedCount.toDouble() / totalRfqs.toDouble()) * 100.0 else 0.0
                 val tradedAwayRate = if (totalRfqs > 0) (tradedAwayCount.toDouble() / totalRfqs.toDouble()) * 100.0 else 0.0
                 val othersRate = 100.0 - tradeCompletedRate - tradedAwayRate;
-                ClientPercentages(clientName = clientName, tradeCompletedPercent = tradeCompletedRate, tradedAwayPrecent = tradedAwayRate, othersPercent = othersRate, totalRfqs = totalRfqs)
+                ClientPercentages(clientName = if(clientName == "Select Client") "Unknown" else clientName, tradeCompletedPercent = tradeCompletedRate, tradedAwayPrecent = tradedAwayRate, othersPercent = othersRate, totalRfqs = totalRfqs)
             }
             .sortedByDescending { it.tradeCompletedPercent }
         return clientStats
@@ -124,9 +158,27 @@ class RfqStatsServiceImpl @Autowired constructor(private val rfqRepository: RfqR
         val today = LocalDate.now().format(DateTimeFormatter.ofPattern("M/d/yyyy"))
         val todayRfqs = rfqRepository.findByActiveTrueAndTradeDate(today)
         val totalRfqs = todayRfqs.size.toLong()
-        val statusCounts = RfqStatus.values().associateWith { status ->
-            todayRfqs.count { it.status == status }.toLong()
+
+        val statusAggregates = RfqStatus.values().associateWith { status ->
+            val rfqsForStatus = todayRfqs.filter { it.status == status }
+            val count = rfqsForStatus.size.toLong()
+            val totalNotionalInUSD = rfqsForStatus.sumOf { it.notionalInUSD.toDoubleOrNull() ?: 0.0 }
+            val totalSalesCreditAmount = rfqsForStatus.sumOf { it.salesCreditAmount.toDoubleOrNull() ?: 0.0 }
+            val averageNotionalInUSD = if (count > 0) totalNotionalInUSD / count else 0.0
+            val averageSalesCreditAmount = if (count > 0) totalSalesCreditAmount / count else 0.0
+            
+            StatusAggregates(
+                count = count,
+                totalNotionalInUSD = totalNotionalInUSD,
+                totalSalesCreditAmount = totalSalesCreditAmount,
+                averageNotionalInUSD = averageNotionalInUSD,
+                averageSalesCreditAmount = averageSalesCreditAmount
+            )
         }
-        return RfqStats(totalRfqs = totalRfqs, statusCounts = statusCounts)
+        
+        return RfqStats(
+            totalRfqs = totalRfqs,
+            statusAggregates = statusAggregates
+        )
     }
 }
