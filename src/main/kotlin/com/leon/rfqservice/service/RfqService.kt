@@ -10,7 +10,7 @@ interface RfqService
     
     fun getRfqById(rfqId: String): Rfq?
     
-    fun getAllRfqs(fromDaysAgo: Int): List<Rfq>
+    fun getAllRfqs(): List<Rfq>
     
     fun deleteRfq(rfqId: String): Boolean
 }

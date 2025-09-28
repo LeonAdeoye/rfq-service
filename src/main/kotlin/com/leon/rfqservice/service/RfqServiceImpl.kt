@@ -7,7 +7,9 @@ import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Service
 class RfqServiceImpl @Autowired constructor(private val rfqRepository: RfqRepository, private val objectMapper: ObjectMapper, private val ampsService: AmpsService) : RfqService
@@ -19,7 +21,7 @@ class RfqServiceImpl @Autowired constructor(private val rfqRepository: RfqReposi
     fun init()
     {
         logger.info("RFQ Service initialized")
-        val today = LocalDateTime.now().toLocalDate().toString()
+        val today = LocalDate.now().format(DateTimeFormatter.ofPattern("M/d/yyyy"))
         val activeRfqs = rfqRepository.findByActiveTrueAndTradeDate(today)
         logger.info("Loaded ${activeRfqs.size} active RFQs for today ($today)")
         activeRfqs.forEach { rfqCache[it.rfqId] = it }
@@ -28,6 +30,7 @@ class RfqServiceImpl @Autowired constructor(private val rfqRepository: RfqReposi
     override fun createRfq(rfq: Rfq): Rfq 
     {
         ampsService.publishRfqUpdate(rfq)
+        rfqCache[rfq.rfqId] = rfq
         return rfqRepository.save(rfq)
     }
 
@@ -44,13 +47,33 @@ class RfqServiceImpl @Autowired constructor(private val rfqRepository: RfqReposi
         rfqMap["updatedAt"] = LocalDateTime.now()
         val updatedRfq = objectMapper.convertValue(rfqMap, Rfq::class.java)
         val savedRfq = rfqRepository.save(updatedRfq)
+        rfqCache[rfqId] = savedRfq
         ampsService.publishRfqUpdate(savedRfq)
         return savedRfq;
     }
 
-    override fun getRfqById(rfqId: String): Rfq? = rfqRepository.findById(rfqId).orElse(null)
-    override fun getAllRfqs(fromDaysAgo: Int): List<Rfq> = rfqRepository.findAll().filter {
-        it.active
+    override fun getRfqById(rfqId: String): Rfq?
+    {
+        return if(!rfqCache.containsKey(rfqId))
+        {
+            val rfq = rfqRepository.findById(rfqId).orElse(null)
+            if(rfq != null)
+                rfqCache[rfqId] = rfq
+            rfq
+        }
+        else
+            rfqCache[rfqId]
+    }
+    override fun getAllRfqs(): List<Rfq>
+    {
+        return if(rfqCache.isEmpty())
+        {
+            val rfqs = rfqRepository.findByActiveTrueAndTradeDate(LocalDate.now().format(DateTimeFormatter.ofPattern("M/d/yyyy")))
+            rfqs.forEach { rfqCache[it.rfqId] = it }
+            rfqs
+        }
+        else
+            rfqCache.values.toList()
     }
 
     override fun deleteRfq(rfqId: String): Boolean
@@ -64,6 +87,7 @@ class RfqServiceImpl @Autowired constructor(private val rfqRepository: RfqReposi
             {
                 val deletedRfq = rfq.copy(active = false, updatedAt = LocalDateTime.now())
                 rfqRepository.save(deletedRfq)
+                rfqCache.remove(rfqId)
                 ampsService.publishRfqUpdate(deletedRfq)
                 true
             }

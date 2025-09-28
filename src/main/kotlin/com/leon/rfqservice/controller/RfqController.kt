@@ -67,17 +67,17 @@ class RfqController @Autowired constructor(private val rfqService: RfqService)
     }
 
     @GetMapping
-    fun getAllRfqs(fromDaysAgo: Int = 1): ResponseEntity<List<Rfq>>
+    fun getAllRfqs(): ResponseEntity<List<Rfq>>
     {
-        logger.info("Received request to get all RFQs from $fromDaysAgo days ago.")
+        logger.info("Received request to get all today's RFQs")
         return try 
         {
-            val rfqs = rfqService.getAllRfqs(fromDaysAgo)
+            val rfqs = rfqService.getAllRfqs()
             ResponseEntity.ok(rfqs)
         } 
         catch (e: Exception) 
         {
-            logger.error("Failed to get all RFQs from $fromDaysAgo days ago.", e)
+            logger.error("Failed to get all today's RFQs.", e)
             ResponseEntity.badRequest().build()
         }
     }
