@@ -3,6 +3,7 @@ package com.leon.rfqservice.service
 import com.leon.rfqservice.model.Rfq
 import com.leon.rfqservice.repository.RfqRepository
 import com.fasterxml.jackson.databind.ObjectMapper
+import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -12,6 +13,17 @@ import java.time.LocalDateTime
 class RfqServiceImpl @Autowired constructor(private val rfqRepository: RfqRepository, private val objectMapper: ObjectMapper, private val ampsService: AmpsService) : RfqService
 {
     private val logger = LoggerFactory.getLogger(RfqServiceImpl::class.java)
+    private val rfqCache = mutableMapOf<String, Rfq>()
+
+    @PostConstruct
+    fun init()
+    {
+        logger.info("RFQ Service initialized")
+        val today = LocalDateTime.now().toLocalDate().toString()
+        val activeRfqs = rfqRepository.findByActiveTrueAndTradeDate(today)
+        logger.info("Loaded ${activeRfqs.size} active RFQs for today ($today)")
+        activeRfqs.forEach { rfqCache[it.rfqId] = it }
+    }
 
     override fun createRfq(rfq: Rfq): Rfq 
     {

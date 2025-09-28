@@ -12,7 +12,7 @@ interface RfqStatsService
     fun getClientStatsByStatus(status: String): List<ClientStats>
     fun getInstrumentStatsByStatus(status: String): List<InstrumentStats>
     fun getDailyStats(days: Int): List<DailyStats>
-    fun getClientSuccessRates(): List<ClientSuccessRate>
+    fun getClientPercentageRates(tradeDate: String): List<ClientSuccessRate>
     fun getTodayStats(): RfqStats
 }
 

@@ -6,12 +6,15 @@ data class ClientSuccessRate(
     @field:JsonProperty("clientName")
     val clientName: String,
     
-    @field:JsonProperty("successRate")
-    val successRate: Double,
+    @field:JsonProperty("TradeCompletedRate")
+    val tradeCompletedRate: Double,
 
-    @field:JsonProperty("failureRate")
-    val failureRate: Double,
-    
+    @field:JsonProperty("tradedAwayRate")
+    val tradedAwayRate: Double,
+
+    @field:JsonProperty("othersRate")
+    val othersRate: Double,
+
     @field:JsonProperty("totalRfqs")
     val totalRfqs: Long
 )

@@ -34,7 +34,7 @@ class RfqStatsController @Autowired constructor(private val statsService: RfqSta
         }
     }
 
-    @GetMapping("/status/{status}")
+    @GetMapping("/clients/{status}")
     fun getClientStatsByStatus(@PathVariable status: String): ResponseEntity<List<ClientStats>> 
     {
         logger.info("Received request to get client stats by status: $status")
@@ -82,18 +82,18 @@ class RfqStatsController @Autowired constructor(private val statsService: RfqSta
         }
     }
 
-    @GetMapping("/client-success-rates")
-    fun getClientSuccessRates(): ResponseEntity<List<ClientSuccessRate>> 
+    @GetMapping("/client-percentage-rates/{fromTradeDate}") // mm-dd-yyyy
+    fun getClientPercentageRates(@PathVariable fromTradeDate: String): ResponseEntity<List<ClientSuccessRate>>
     {
-        logger.info("Received request to get client success rates")
+        logger.info("Received request to get client percentage rates from trade date $fromTradeDate")
         return try 
         {
-            val successRates = statsService.getClientSuccessRates()
+            val successRates = statsService.getClientPercentageRates(fromTradeDate)
             ResponseEntity.ok(successRates)
         } 
         catch (e: Exception) 
         {
-            logger.error("Failed to get client success rates", e)
+            logger.error("Failed to get client percentage rates", e)
             ResponseEntity.badRequest().build()
         }
     }

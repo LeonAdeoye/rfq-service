@@ -15,4 +15,5 @@ interface RfqRepository : MongoRepository<Rfq, String>
     fun findByActiveTrueAndClientAndTradeDate(client: String, tradeDate: String): List<Rfq>
     
     fun findByActiveTrueAndStatusAndTradeDate(status: RfqStatus, tradeDate: String): List<Rfq>
+    fun findByActiveTrueAndTradeDateGreaterThanEqual(tradeDate: String): List<Rfq>
 }

@@ -17,7 +17,7 @@ class RfqStatsServiceImpl @Autowired constructor(private val rfqRepository: RfqR
 {
     override fun getStatsByClient(client: String): RfqStats
     {
-        val today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        val today = LocalDate.now().format(DateTimeFormatter.ofPattern("M/d/yyyy"))
         val clientRfqs = rfqRepository.findByActiveTrueAndClientAndTradeDate(client, today)
         val totalRfqs = clientRfqs.size.toLong()
         val statusCounts = RfqStatus.values().associateWith { status ->
@@ -33,7 +33,7 @@ class RfqStatsServiceImpl @Autowired constructor(private val rfqRepository: RfqR
     override fun getClientStatsByStatus(status: String): List<ClientStats>
     {
         val statusEnum = RfqStatus.valueOf(status)
-        val today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        val today = LocalDate.now().format(DateTimeFormatter.ofPattern("M/d/yyyy"))
         val rfqsByStatus = rfqRepository.findByActiveTrueAndStatusAndTradeDate(statusEnum, today)
 
         return rfqsByStatus.groupBy { it.client }
@@ -41,7 +41,7 @@ class RfqStatsServiceImpl @Autowired constructor(private val rfqRepository: RfqR
                 val statusCount = rfqs.size.toLong()
                 val totalNotional = rfqs.sumOf { it.notionalInLocal }
                 ClientStats(
-                    clientName = clientName,
+                    clientName = if(clientName == "Select Client") "Unknown" else clientName,
                     statusCount = statusCount,
                     totalNotional = totalNotional,
                     averageNotional = if (statusCount > 0) totalNotional / statusCount else 0.0
@@ -53,7 +53,7 @@ class RfqStatsServiceImpl @Autowired constructor(private val rfqRepository: RfqR
     override fun getInstrumentStatsByStatus(status: String): List<InstrumentStats>
     {
         val statusEnum = RfqStatus.valueOf(status)
-        val today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        val today = LocalDate.now().format(DateTimeFormatter.ofPattern("M/d/yyyy"))
         val rfqsByStatus = rfqRepository.findByActiveTrueAndStatusAndTradeDate(statusEnum, today)
         
         return rfqsByStatus.groupBy { it.underlying }
@@ -79,7 +79,7 @@ class RfqStatsServiceImpl @Autowired constructor(private val rfqRepository: RfqR
         for (i in 0 until days) 
         {
             val date = today.minusDays(i.toLong())
-            val dateString = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+            val dateString = date.format(DateTimeFormatter.ofPattern("M/d/yyyy"))
             val rfqsForDate = rfqRepository.findByActiveTrueAndTradeDate(dateString)
             dailyStats.add(
                 DailyStats(
@@ -91,36 +91,54 @@ class RfqStatsServiceImpl @Autowired constructor(private val rfqRepository: RfqR
                 )
             )
         }
-        
         return dailyStats.sortedBy { it.date }
     }
 
-    override fun getClientSuccessRates(): List<ClientSuccessRate> 
+    override fun getClientPercentageRates(tradeDate: String): List<ClientSuccessRate>
     {
-        val allActiveRfqs = rfqRepository.findByActiveTrue()
+        val inputDate = try
+        {
+            LocalDate.parse(tradeDate, DateTimeFormatter.ofPattern("MM-dd-yyyy"))
+        }
+        catch (e: Exception)
+        {
+            try
+            {
+                LocalDate.parse(tradeDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+            }
+            catch (e2: Exception)
+            {
+                LocalDate.parse(tradeDate, DateTimeFormatter.ofPattern("M/d/yyyy"))
+            }
+        }
+
+        val dbDateFormat = inputDate.format(DateTimeFormatter.ofPattern("M/d/yyyy"))
+        val allActiveRfqs = rfqRepository.findByActiveTrueAndTradeDateGreaterThanEqual(dbDateFormat)
         val clientStats = allActiveRfqs.groupBy { it.client }
             .map { (clientName, rfqs) ->
                 val totalRfqs = rfqs.size.toLong()
                 val tradeCompletedCount = rfqs.count { it.status == RfqStatus.TRADE_COMPLETED }.toLong()
                 val tradedAwayCount = rfqs.count { it.status == RfqStatus.TRADED_AWAY }.toLong()
-                val successRate = if (totalRfqs > 0) (tradeCompletedCount.toDouble() / totalRfqs.toDouble()) * 100.0 else 0.0
-                val failureRate = if (totalRfqs > 0) (tradedAwayCount.toDouble() / totalRfqs.toDouble()) * 100.0 else 0.0
+                val tradeCompletedRate = if (totalRfqs > 0) (tradeCompletedCount.toDouble() / totalRfqs.toDouble()) * 100.0 else 0.0
+                val tradedAwayRate = if (totalRfqs > 0) (tradedAwayCount.toDouble() / totalRfqs.toDouble()) * 100.0 else 0.0
+                val othersRate = 100.0 - tradeCompletedRate - tradedAwayRate;
                 
                 ClientSuccessRate(
                     clientName = clientName,
-                    successRate = successRate,
-                    failureRate = failureRate,
+                    tradeCompletedRate = tradeCompletedRate,
+                    tradedAwayRate = tradedAwayRate,
+                    othersRate = othersRate,
                     totalRfqs = totalRfqs
                 )
             }
-            .sortedByDescending { it.successRate }
+            .sortedByDescending { it.tradeCompletedRate }
         
         return clientStats
     }
 
     override fun getTodayStats(): RfqStats
     {
-        val today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        val today = LocalDate.now().format(DateTimeFormatter.ofPattern("M/d/yyyy"))
         val todayRfqs = rfqRepository.findByActiveTrueAndTradeDate(today)
         val totalRfqs = todayRfqs.size.toLong()
         val statusCounts = RfqStatus.values().associateWith { status ->
