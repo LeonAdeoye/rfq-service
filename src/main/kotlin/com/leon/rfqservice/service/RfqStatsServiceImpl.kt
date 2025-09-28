@@ -23,11 +23,7 @@ class RfqStatsServiceImpl @Autowired constructor(private val rfqRepository: RfqR
         val statusCounts = RfqStatus.values().associateWith { status ->
             clientRfqs.count { it.status == status }.toLong()
         }
-        
-        return RfqStats(
-            totalRfqs = totalRfqs,
-            statusCounts = statusCounts,
-        )
+        return RfqStats(totalRfqs = totalRfqs, statusCounts = statusCounts)
     }
 
     override fun getClientStatsByStatus(status: String): List<ClientStats>
@@ -61,12 +57,7 @@ class RfqStatsServiceImpl @Autowired constructor(private val rfqRepository: RfqR
                 val statusCount = rfqs.size.toLong()
                 val totalNotional = rfqs.sumOf { it.notionalInLocal }
                 val averageNotional = if (statusCount > 0) totalNotional / statusCount else 0.0
-                InstrumentStats(
-                    instrument = instrument,
-                    statusCount = statusCount,
-                    totalNotional = totalNotional,
-                    averageNotional = averageNotional
-                )
+                InstrumentStats(instrument = instrument, statusCount = statusCount, totalNotional = totalNotional, averageNotional = averageNotional)
             }
             .sortedByDescending { it.statusCount }
     }
@@ -122,17 +113,9 @@ class RfqStatsServiceImpl @Autowired constructor(private val rfqRepository: RfqR
                 val tradeCompletedRate = if (totalRfqs > 0) (tradeCompletedCount.toDouble() / totalRfqs.toDouble()) * 100.0 else 0.0
                 val tradedAwayRate = if (totalRfqs > 0) (tradedAwayCount.toDouble() / totalRfqs.toDouble()) * 100.0 else 0.0
                 val othersRate = 100.0 - tradeCompletedRate - tradedAwayRate;
-                
-                ClientPercentages(
-                    clientName = clientName,
-                    tradeCompletedPercent = tradeCompletedRate,
-                    tradedAwayPrecent = tradedAwayRate,
-                    othersPercent = othersRate,
-                    totalRfqs = totalRfqs
-                )
+                ClientPercentages(clientName = clientName, tradeCompletedPercent = tradeCompletedRate, tradedAwayPrecent = tradedAwayRate, othersPercent = othersRate, totalRfqs = totalRfqs)
             }
             .sortedByDescending { it.tradeCompletedPercent }
-        
         return clientStats
     }
 
@@ -144,10 +127,6 @@ class RfqStatsServiceImpl @Autowired constructor(private val rfqRepository: RfqR
         val statusCounts = RfqStatus.values().associateWith { status ->
             todayRfqs.count { it.status == status }.toLong()
         }
-        
-        return RfqStats(
-            totalRfqs = totalRfqs,
-            statusCounts = statusCounts,
-        )
+        return RfqStats(totalRfqs = totalRfqs, statusCounts = statusCounts)
     }
 }
